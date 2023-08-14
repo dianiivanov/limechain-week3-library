@@ -1,4 +1,5 @@
 import { HardhatUserConfig, task } from "hardhat/config";
+import {network} from "hardhat";
 import "@nomicfoundation/hardhat-toolbox";
 
 import * as dotenv from "dotenv";
@@ -45,9 +46,31 @@ const lazyImport = async (module: any) => {
   return await import(module);
 }
 
-task("deploy", "Deploy BookLibrary").setAction(async () => {
+task("deploy", "Deploy BookLibrary").setAction(async (args, hre) => {
+  await hre.run('compile');
   const{ deployBookLibrary } = await lazyImport("./scripts/deploy-booklibrary");
   await deployBookLibrary();
-})
+});
+
+task("deploy-and-verify", "Deploy BookLibrary").setAction(async (args, hre) => {
+  await hre.run('compile');
+  const{ deployBookLibrary } = await lazyImport("./scripts/deploy-booklibrary");
+  const tx = await deployBookLibrary();
+  const receipt = await tx?.wait(5);
+  console.log("verifying contract: ", receipt.contractAddress);
+  try {
+      await hre.run("verify:verify", {
+          address: receipt.contractAddress,
+          constructorArguments: [],
+      });
+      console.log("Verified");
+  } catch (e: any) {
+      if(e.message.toLowerCase().includes("already verified")) {
+          console.log("Already verified!");
+      } else {
+          console.log(e);
+      }
+  }
+});
 
 export default config;
