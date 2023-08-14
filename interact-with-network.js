@@ -37,8 +37,9 @@ const run = async function (network, libraryContractAddress) {
 const args = process.argv.slice(2);
 if (args.length < 2) {
   console.log(
-    "Usage: node interact-with-local.js <network> <smart contract address>"
+    "Usage: node interact-with-network.js <network> <smart contract address>"
   );
+
   process.exit(1);
 }
 

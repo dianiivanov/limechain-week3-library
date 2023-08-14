@@ -36,6 +36,7 @@ const run = async function (libraryContractAddress) {
 };
 
 const args = process.argv.slice(2);
+
 if (args.length < 1) {
   console.log("Usage: node interact-with-local.js <smart contract address>");
   process.exit(1);
