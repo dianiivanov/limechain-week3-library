@@ -111,12 +111,20 @@ describe("BookLibrary", function() {
         await expect(bookLibrary.connect(notOwner).borrow("asd")).to.be.revertedWithCustomError(bookLibrary, "BookUnavailable")
             .withArgs(notOwner.address,"asd");
     });
+    it("Should return true as the book is borrowed", async() => {
+        const [owner, user] = await ethers.getSigners();
+        expect(await bookLibrary.connect(user).isBookBorrowed("Book3")).to.be.true;
+    });
     it("Should increment copies of a book by 1 when return a book successfully ", async() => {
         const beforeBorrowCopies = await bookLibrary.getBookCopies("Book3");
         const [owner, user] = await ethers.getSigners();
         await bookLibrary.connect(user).returnBook("Book3");
 
         expect(await bookLibrary.getBookCopies("Book3")).to.equal(Number(beforeBorrowCopies) + 1);    
+    });
+    it("Should return true as the book is not borrowed", async() => {
+        const [owner, user] = await ethers.getSigners();
+        expect(await bookLibrary.connect(user).isBookBorrowed("Book3")).to.be.false;
     });
     it("Should revert with custom error BookNotBorrowed when returning a book that's not borrowed ", async() => {
         const beforeBorrowCopies = await bookLibrary.getBookCopies("Book3");

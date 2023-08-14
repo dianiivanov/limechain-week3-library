@@ -130,6 +130,13 @@ contract BookLibrary is Ownable {
         return bookToInfo[stringToBytes32(_bookName)].allBorrowersEver;
     }
 
+    function isBookBorrowed(
+        string memory _bookName
+    ) external view returns (bool) {
+        bytes32 bookNameInBytes32 = stringToBytes32(_bookName);
+        return bookToBorrower[bookNameInBytes32][msg.sender].isBorrowed;
+    }
+
     function stringToBytes32(string memory str) public pure returns (bytes32) {
         return keccak256(bytes(str));
     }
