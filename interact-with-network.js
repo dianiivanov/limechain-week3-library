@@ -1,7 +1,7 @@
 const { ethers } = require("ethers");
 const BookLibrary = require("./artifacts/contracts/BookLibrary.sol/BookLibrary.json");
 require("dotenv").config();
-const libraryUtils = require("./libraryUtils");
+const { getLibraryUtils } = require("./libraryUtils");
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const INFURA_API_KEY = process.env.INFURA_API_KEY;
@@ -17,21 +17,20 @@ const run = async function (network, libraryContractAddress) {
     wallet
   );
 
+  const libraryUtils = getLibraryUtils(libraryContract);
+
   console.log(`Creating ${BOOK_TO_USE}...`);
-  await libraryUtils.createBook(libraryContract, BOOK_TO_USE, 10);
-  await libraryUtils.logIfBorrowedAndBookCopies(libraryContract, BOOK_TO_USE);
-  console.log(
-    "Books in the library:",
-    await libraryUtils.checkAllBooks(libraryContract)
-  );
+  await libraryUtils.createBook(BOOK_TO_USE, 10);
+  await libraryUtils.logIfBorrowedAndBookCopies(BOOK_TO_USE);
+  console.log("Books in the library:", await libraryUtils.checkAllBooks());
 
   console.log(`Renting ${BOOK_TO_USE}...`);
-  await libraryUtils.rentABook(libraryContract, BOOK_TO_USE);
-  await libraryUtils.logIfBorrowedAndBookCopies(libraryContract, BOOK_TO_USE);
+  await libraryUtils.rentABook(BOOK_TO_USE);
+  await libraryUtils.logIfBorrowedAndBookCopies(BOOK_TO_USE);
 
   console.log(`Returning  ${BOOK_TO_USE}...`);
-  await libraryUtils.returnABook(libraryContract, BOOK_TO_USE);
-  await libraryUtils.logIfBorrowedAndBookCopies(libraryContract, BOOK_TO_USE);
+  await libraryUtils.returnABook(BOOK_TO_USE);
+  await libraryUtils.logIfBorrowedAndBookCopies(BOOK_TO_USE);
 };
 
 const args = process.argv.slice(2);
