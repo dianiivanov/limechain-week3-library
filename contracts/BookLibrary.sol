@@ -36,6 +36,10 @@ contract BookLibrary is Ownable {
     error EndingIndexIsMoreThanBooks();
     error StartingIndexIsMoreOrEqualToEndingIndex();
 
+    event BookAdded(string indexed name, uint32 copies);
+    event BookBorrowed(string indexed name, address indexed borrower);
+    event BookReturned(string indexed name, address indexed borrower);
+
     struct BookInfo {
         bool isBookRecordedInLibrary;
         uint32 copies;
@@ -61,6 +65,7 @@ contract BookLibrary is Ownable {
             bookToInfo[bookNameInBytes32].isBookRecordedInLibrary = true;
         }
         bookToInfo[bookNameInBytes32].copies += _numberOfCopies;
+        emit BookAdded(_bookName, _numberOfCopies);
     }
 
     function getBooksPage(
@@ -92,7 +97,7 @@ contract BookLibrary is Ownable {
 
     function getBookCopies(
         string memory _bookName
-    ) public view returns (uint256) {
+    ) external view returns (uint256) {
         bytes32 bookNameInBytes32 = stringToBytes32(_bookName);
         return bookToInfo[bookNameInBytes32].copies;
     }
@@ -112,6 +117,8 @@ contract BookLibrary is Ownable {
             bookToInfo[bookNameInBytes32].allBorrowersEver.push(msg.sender);
         }
         bookToInfo[bookNameInBytes32].copies--;
+
+        emit BookBorrowed(_bookName, msg.sender);
     }
 
     function returnBook(string memory _bookName) external {
@@ -122,6 +129,8 @@ contract BookLibrary is Ownable {
 
         bookToBorrower[bookNameInBytes32][msg.sender].isBorrowed = false;
         bookToInfo[bookNameInBytes32].copies++;
+
+        emit BookReturned(_bookName, msg.sender);
     }
 
     function getBooksBorrowers(
